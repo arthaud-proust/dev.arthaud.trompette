@@ -71,12 +71,6 @@ describe('NoteSet', () => {
 })
 
 describe('Note', () => {
-  const originalRandom = Math.random
-
-  afterEach(() => {
-    Math.random = originalRandom
-  })
-
   it('can instantiate note from a set', () => {
     const note = new Note(new NoteSet([NOTES.DO, NOTES.RE]), NOTES.DO)
 

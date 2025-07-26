@@ -1,4 +1,4 @@
-import { next, prev, randomElement } from '@/core/util/array'
+import { next, prev, randomElement } from '@/core/utils/array'
 
 export const NOTES = Object.freeze({
   DO: 'do',

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { next, prev, shuffled } from '@/core/util/array'
+import { next, prev, shuffled } from '@/core/utils/array'
 
 describe('prev', () => {
   it('return previous element', () => {
