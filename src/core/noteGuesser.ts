@@ -1,30 +1,31 @@
-import type { Note } from '@/core/notes'
-import { nextNote, previousNote, randomNote } from '@/core/notes'
+import { BaseNoteSet, Note, NoteSet } from '@/core/note'
 
 export class Statement {
   constructor(
     public readonly note: Note,
-    public readonly direction: 'next' | 'previous',
+    public readonly direction: 'asc' | 'desc',
   ) {}
 
-  public static random(): Statement {
-    return new Statement(randomNote(), Math.random() < 0.5 ? 'next' : 'previous')
+  public static randomFor(set: NoteSet): Statement {
+    return new Statement(set.randomNote(), Math.random() < 0.5 ? 'asc' : 'desc')
   }
 
   isCorrectGuess(note: Note): boolean {
-    const isCorrectNextNote = this.direction === 'next' && note === nextNote(this.note)
-    const isCorrectPreviousNote = this.direction === 'previous' && note === previousNote(this.note)
+    const isCorrectAscNote = this.direction === 'asc' && this.note.ascended.value === note.value
+    const isCorrectDescNote = this.direction === 'desc' && this.note.descended.value === note.value
 
-    return isCorrectNextNote || isCorrectPreviousNote
+    return isCorrectAscNote || isCorrectDescNote
   }
 }
 
 export class NoteGuesser {
+  readonly set: NoteSet
   private _score: number = 0
   private _statement: Statement
 
-  constructor() {
-    this._statement = Statement.random()
+  constructor(set: NoteSet = BaseNoteSet) {
+    this.set = set
+    this._statement = Statement.randomFor(this.set)
   }
 
   guess(note: Note): void {
@@ -32,7 +33,7 @@ export class NoteGuesser {
       this._score++
     }
 
-    this._statement = Statement.random()
+    this._statement = Statement.randomFor(this.set)
   }
 
   get score() {

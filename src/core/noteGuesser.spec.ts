@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { NoteGuesser } from '@/core/noteGuesser'
-import { nextNote, NOTES, previousNote } from '@/core/notes'
+import { BaseNoteSet, Note } from '@/core/note'
 
 describe('NoteGuesser', () => {
+  it('can be instantiated with specific set', () => {
+    const noteGuesser = new NoteGuesser(BaseNoteSet)
+    expect(noteGuesser.set).toBe(BaseNoteSet)
+  })
+
   it('starts with score of 0', () => {
     const noteGuesser = new NoteGuesser()
     expect(noteGuesser.score).toBe(0)
@@ -10,17 +15,17 @@ describe('NoteGuesser', () => {
 
   it('ask previous or next of a random note', () => {
     const noteGuesser = new NoteGuesser()
-    expect(['next', 'previous']).toContain(noteGuesser.statement.direction)
-    expect(NOTES).toContain(noteGuesser.statement.note)
+    expect(['asc', 'desc']).toContain(noteGuesser.statement.direction)
+    expect(noteGuesser.statement.note).toBeInstanceOf(Note)
   })
 
   it('increments score by 1 when correct note is guessed', () => {
     const noteGuesser = new NoteGuesser()
 
-    if (noteGuesser.statement.direction === 'next') {
-      noteGuesser.guess(nextNote(noteGuesser.statement.note))
+    if (noteGuesser.statement.direction === 'asc') {
+      noteGuesser.guess(noteGuesser.statement.note.ascended)
     } else {
-      noteGuesser.guess(previousNote(noteGuesser.statement.note))
+      noteGuesser.guess(noteGuesser.statement.note.descended)
     }
 
     expect(noteGuesser.score).toBe(1)
@@ -30,10 +35,10 @@ describe('NoteGuesser', () => {
     const noteGuesser = new NoteGuesser()
     const initialStatement = { ...noteGuesser.statement }
 
-    if (noteGuesser.statement.direction === 'next') {
-      noteGuesser.guess(nextNote(noteGuesser.statement.note))
+    if (noteGuesser.statement.direction === 'asc') {
+      noteGuesser.guess(noteGuesser.statement.note.ascended)
     } else {
-      noteGuesser.guess(previousNote(noteGuesser.statement.note))
+      noteGuesser.guess(noteGuesser.statement.note.descended)
     }
 
     expect(noteGuesser.statement).not.toBe(initialStatement)
