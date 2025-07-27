@@ -20,7 +20,8 @@ export class Statement {
 
 export class NoteGuesser {
   readonly set: NoteSet
-  private _score: number = 0
+  private _incorrectAnswers: number = 0
+  private _correctAnswers: number = 0
   private _statement: Statement
 
   constructor(set: NoteSet = BaseNoteSet) {
@@ -29,17 +30,23 @@ export class NoteGuesser {
   }
 
   handleGuessCorrect(): void {
-    this._score++
+    this._correctAnswers++
 
     this._statement = Statement.randomFor(this.set)
   }
 
   handleGuessWrong(): void {
+    this._incorrectAnswers++
+
     this._statement = Statement.randomFor(this.set)
   }
 
-  get score() {
-    return this._score
+  get correctAnswers() {
+    return this._correctAnswers
+  }
+
+  get incorrectAnswers() {
+    return this._incorrectAnswers
   }
 
   get note() {

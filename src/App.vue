@@ -48,7 +48,17 @@ onKeyStroke('ArrowDown', () => handleGuessWrong())
         </select>
       </p>
 
-      <p>Score : {{ guesser.score }}</p>
+      <section class="space-x-3">
+        <p class="inline-flex items-center gap-0.5">
+          <span class="sr-only">Nombre de réponse correctes :</span>
+          <CheckIcon class="inline-block text-green-600 size-6" /> {{ guesser.correctAnswers }}
+        </p>
+        <p class="inline-flex items-center gap-0.5">
+          <span class="sr-only">Nombre de réponse incorrectes :</span>
+
+          <XMarkIcon class="inline-block text-red-600 size-6" /> {{ guesser.incorrectAnswers }}
+        </p>
+      </section>
     </header>
 
     <section class="py-8">

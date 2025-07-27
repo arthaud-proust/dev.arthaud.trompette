@@ -9,9 +9,14 @@ describe('NoteGuesser', () => {
     expect(noteGuesser.set).toBe(BaseNoteSet)
   })
 
-  it('starts with score of 0', () => {
+  it('starts with 0 correct answers', () => {
     const noteGuesser = new NoteGuesser()
-    expect(noteGuesser.score).toBe(0)
+    expect(noteGuesser.correctAnswers).toBe(0)
+  })
+
+  it('starts with 0 incorrect answers', () => {
+    const noteGuesser = new NoteGuesser()
+    expect(noteGuesser.incorrectAnswers).toBe(0)
   })
 
   it('ask previous or next of a random note', () => {
@@ -27,12 +32,12 @@ describe('NoteGuesser', () => {
     expect(noteGuesser.answer.value).toBe(NOTES.DO)
   })
 
-  it('increments score by 1 when correct note is guessed', () => {
+  it('increments correct answers by 1 when correct note is guessed', () => {
     const noteGuesser = new NoteGuesser()
 
     noteGuesser.handleGuessCorrect()
 
-    expect(noteGuesser.score).toBe(1)
+    expect(noteGuesser.correctAnswers).toBe(1)
   })
 
   it('changes statement after correct note is guessed', () => {
@@ -44,12 +49,12 @@ describe('NoteGuesser', () => {
     expect([noteGuesser.note, noteGuesser.direction]).not.toBe(initialStatement)
   })
 
-  it("don't change score when correct note is not guessed", () => {
+  it('increments incorrect answers by 1 when correct note is not guessed', () => {
     const noteGuesser = new NoteGuesser()
 
     noteGuesser.handleGuessWrong()
 
-    expect(noteGuesser.score).toBe(0)
+    expect(noteGuesser.incorrectAnswers).toBe(1)
   })
 
   it('changes statement after incorrect guess', () => {
