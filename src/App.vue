@@ -4,6 +4,8 @@ import { NoteGuesser } from '@/core/noteGuesser'
 import { type Ref, ref, watch } from 'vue'
 import { ArrowDownRightIcon, ArrowUpRightIcon } from '@heroicons/vue/24/solid'
 import { CheckIcon, XMarkIcon } from '@heroicons/vue/20/solid'
+import { ArrowDownIcon, ArrowUpIcon } from '@heroicons/vue/16/solid'
+import { onKeyStroke } from '@vueuse/core'
 
 // "as T" is needed because ref don't handle private class methods
 // See https://github.com/vuejs/core/issues/2981
@@ -11,21 +13,28 @@ const set = ref(BaseNoteSet) as Ref<NoteSet>
 
 const guesser = ref(new NoteGuesser(set.value))
 
-const showSolution = ref(false)
+const isSolutionDisplayed = ref(false)
 
 const handleGuessCorrect = () => {
   guesser.value.handleGuessCorrect()
-  showSolution.value = false
+  isSolutionDisplayed.value = false
 }
 
 const handleGuessWrong = () => {
   guesser.value.handleGuessWrong()
-  showSolution.value = false
+  isSolutionDisplayed.value = false
 }
 
 watch(set, (newSet) => {
   guesser.value = new NoteGuesser(newSet)
 })
+
+onKeyStroke(' ', () => {
+  isSolutionDisplayed.value = !isSolutionDisplayed.value
+})
+
+onKeyStroke('ArrowUp', () => handleGuessCorrect())
+onKeyStroke('ArrowDown', () => handleGuessWrong())
 </script>
 
 <template>
@@ -55,28 +64,32 @@ watch(set, (newSet) => {
       </p>
     </section>
 
-    <div v-if="showSolution" class="flex flex-col gap-1">
+    <div v-if="isSolutionDisplayed" class="flex flex-col gap-1">
       <p class="text-neutral-500">La réponse est</p>
       <p class="text-4xl pb-4">{{ guesser.answer.value }}</p>
       <button
         @click="handleGuessCorrect"
         class="cursor-pointer flex items-center justify-center gap-1 bg-green-100 text-green-900 py-2 px-4 rounded-md"
       >
-        <CheckIcon class="inline-block size-6" /> J'ai eu bon
+        <CheckIcon class="inline-block size-6" />
+        J'ai eu bon
+        <kbd class="ml-2"><ArrowUpIcon class="size-4" /></kbd>
       </button>
       <button
         @click="handleGuessWrong"
         class="cursor-pointer flex items-center justify-center gap-1 bg-red-100 text-red-900 py-2 px-4 rounded-md"
       >
-        <XMarkIcon class="inline-block size-6" /> J'ai eu faux
+        <XMarkIcon class="inline-block size-6" />
+        J'ai eu faux
+        <kbd class="ml-2"><ArrowDownIcon class="size-4" /></kbd>
       </button>
     </div>
     <button
       v-else
-      @click="showSolution = true"
-      class="cursor-pointer bg-neutral-100 py-2 px-4 rounded-md"
+      @click="isSolutionDisplayed = true"
+      class="cursor-pointer flex items-center justify-center gap-1 bg-neutral-100 py-2 px-4 rounded-md"
     >
-      Voir la solution
+      Voir la solution <kbd class="ml-2">Espace</kbd>
     </button>
   </main>
 </template>
