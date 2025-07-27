@@ -1,10 +1,27 @@
 <script setup lang="ts">
 import { BaseNoteSet, CompleteNoteSet, NoteSet } from '@/core/note'
 import { NoteGuesser } from '@/core/noteGuesser'
-import { ref, watch } from 'vue'
+import { type Ref, ref, watch } from 'vue'
+import { ArrowDownRightIcon, ArrowUpRightIcon } from '@heroicons/vue/24/solid'
+import { CheckIcon, XMarkIcon } from '@heroicons/vue/20/solid'
 
-const set = ref<NoteSet>(BaseNoteSet)
+// "as T" is needed because ref don't handle private class methods
+// See https://github.com/vuejs/core/issues/2981
+const set = ref(BaseNoteSet) as Ref<NoteSet>
+
 const guesser = ref(new NoteGuesser(set.value))
+
+const showSolution = ref(false)
+
+const handleGuessCorrect = () => {
+  guesser.value.handleGuessCorrect()
+  showSolution.value = false
+}
+
+const handleGuessWrong = () => {
+  guesser.value.handleGuessWrong()
+  showSolution.value = false
+}
 
 watch(set, (newSet) => {
   guesser.value = new NoteGuesser(newSet)
@@ -12,25 +29,54 @@ watch(set, (newSet) => {
 </script>
 
 <template>
-  <main class="flex flex-col items-center justify-center h-dvh gap-6 p-2">
-    <label>
-      <span>Notes</span>
-      <select v-model="set">
-        <option :value="CompleteNoteSet">Toutes les notes</option>
-        <option :value="BaseNoteSet">Notes de base</option>
-      </select>
-    </label>
-    <p>Score : {{ guesser.score }}</p>
-    <p class="text-4xl">
-      {{ guesser.statement.note.value }}
-      {{ guesser.statement.direction === 'asc' ? '+1' : '-1' }}
-    </p>
-    <div
-      class="w-full h-12 grid grid-flow-col auto-cols-fr gap-1 *:bg-neutral-100 *:rounded-lg *:w-full"
-    >
-      <button v-for="note in set.notesAsc" :key="note.value" @click="guesser.guess(note)">
-        {{ note.value }}
+  <main class="flex flex-col text-center pt-20 h-dvh mx-auto max-w-sm gap-6 p-2">
+    <header class="flex justify-between">
+      <p>
+        <span class="sr-only">Notes</span>
+        <select v-model="set">
+          <option :value="CompleteNoteSet">Toutes les notes</option>
+          <option :value="BaseNoteSet">Notes de base</option>
+        </select>
+      </p>
+
+      <p>Score : {{ guesser.score }}</p>
+    </header>
+
+    <section class="py-8">
+      <p class="text-5xl">
+        {{ guesser.note.value }}
+        <Component
+          :is="guesser.direction === 'asc' ? ArrowUpRightIcon : ArrowDownRightIcon"
+          class="inline-block size-8"
+        />
+      </p>
+      <p class="text-neutral-500 mt-2">
+        {{ guesser.direction === 'asc' ? 'au-dessus' : 'en-dessous' }} du {{ guesser.note.value }}
+      </p>
+    </section>
+
+    <div v-if="showSolution" class="flex flex-col gap-1">
+      <p class="text-neutral-500">La réponse est</p>
+      <p class="text-4xl pb-4">{{ guesser.answer.value }}</p>
+      <button
+        @click="handleGuessCorrect"
+        class="cursor-pointer flex items-center justify-center gap-1 bg-green-100 text-green-900 py-2 px-4 rounded-md"
+      >
+        <CheckIcon class="inline-block size-6" /> J'ai eu bon
+      </button>
+      <button
+        @click="handleGuessWrong"
+        class="cursor-pointer flex items-center justify-center gap-1 bg-red-100 text-red-900 py-2 px-4 rounded-md"
+      >
+        <XMarkIcon class="inline-block size-6" /> J'ai eu faux
       </button>
     </div>
+    <button
+      v-else
+      @click="showSolution = true"
+      class="cursor-pointer bg-neutral-100 py-2 px-4 rounded-md"
+    >
+      Voir la solution
+    </button>
   </main>
 </template>

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { NoteGuesser } from '@/core/noteGuesser'
-import { BaseNoteSet, Note } from '@/core/note'
+import { BaseNoteSet, Note, NOTES, NoteSet } from '@/core/note'
 
+const OnlyDoSet = new NoteSet([NOTES.DO])
 describe('NoteGuesser', () => {
   it('can be instantiated with specific set', () => {
     const noteGuesser = new NoteGuesser(BaseNoteSet)
@@ -15,49 +16,48 @@ describe('NoteGuesser', () => {
 
   it('ask previous or next of a random note', () => {
     const noteGuesser = new NoteGuesser()
-    expect(['asc', 'desc']).toContain(noteGuesser.statement.direction)
-    expect(noteGuesser.statement.note).toBeInstanceOf(Note)
+
+    expect(['asc', 'desc']).toContain(noteGuesser.direction)
+    expect(noteGuesser.note).toBeInstanceOf(Note)
+  })
+
+  it('can display correct answer', () => {
+    const noteGuesser = new NoteGuesser(OnlyDoSet)
+
+    expect(noteGuesser.answer.value).toBe(NOTES.DO)
   })
 
   it('increments score by 1 when correct note is guessed', () => {
     const noteGuesser = new NoteGuesser()
 
-    if (noteGuesser.statement.direction === 'asc') {
-      noteGuesser.guess(noteGuesser.statement.note.ascended)
-    } else {
-      noteGuesser.guess(noteGuesser.statement.note.descended)
-    }
+    noteGuesser.handleGuessCorrect()
 
     expect(noteGuesser.score).toBe(1)
   })
 
   it('changes statement after correct note is guessed', () => {
     const noteGuesser = new NoteGuesser()
-    const initialStatement = { ...noteGuesser.statement }
+    const initialStatement = [noteGuesser.note, noteGuesser.direction]
 
-    if (noteGuesser.statement.direction === 'asc') {
-      noteGuesser.guess(noteGuesser.statement.note.ascended)
-    } else {
-      noteGuesser.guess(noteGuesser.statement.note.descended)
-    }
+    noteGuesser.handleGuessCorrect()
 
-    expect(noteGuesser.statement).not.toBe(initialStatement)
+    expect([noteGuesser.note, noteGuesser.direction]).not.toBe(initialStatement)
   })
 
   it("don't change score when correct note is not guessed", () => {
     const noteGuesser = new NoteGuesser()
 
-    noteGuesser.guess(noteGuesser.statement.note)
+    noteGuesser.handleGuessWrong()
 
     expect(noteGuesser.score).toBe(0)
   })
 
   it('changes statement after incorrect guess', () => {
     const noteGuesser = new NoteGuesser()
-    const initialStatement = { ...noteGuesser.statement }
+    const initialStatement = [noteGuesser.note, noteGuesser.direction]
 
-    noteGuesser.guess(noteGuesser.statement.note)
+    noteGuesser.handleGuessWrong()
 
-    expect(noteGuesser.statement).not.toBe(initialStatement)
+    expect([noteGuesser.note, noteGuesser.direction]).not.toBe(initialStatement)
   })
 })

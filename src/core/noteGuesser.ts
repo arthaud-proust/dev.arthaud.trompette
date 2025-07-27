@@ -28,11 +28,13 @@ export class NoteGuesser {
     this._statement = Statement.randomFor(this.set)
   }
 
-  guess(note: Note): void {
-    if (this._statement.isCorrectGuess(note)) {
-      this._score++
-    }
+  handleGuessCorrect(): void {
+    this._score++
 
+    this._statement = Statement.randomFor(this.set)
+  }
+
+  handleGuessWrong(): void {
     this._statement = Statement.randomFor(this.set)
   }
 
@@ -40,7 +42,15 @@ export class NoteGuesser {
     return this._score
   }
 
-  get statement() {
-    return this._statement
+  get note() {
+    return this._statement.note
+  }
+
+  get direction() {
+    return this._statement.direction
+  }
+
+  get answer() {
+    return this.direction === 'asc' ? this.note.ascended : this.note.descended
   }
 }
